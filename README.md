@@ -11,3 +11,7 @@ Install or link `.agents/skills/bootstrap-agent-repo` into your agent's supporte
 The skill asks which agent hosts to support, suggesting Codex and Claude Code as defaults. It also supports Copilot, Gemini CLI, Qwen Code, Cursor, OpenCode, and Windsurf; specify a complete selection in the request to skip the question. Only selected hosts receive provider-specific configuration, although other hosts may discover shared paths.
 
 Provider discovery, subagent capabilities, and symlink support vary by host and environment; see the skill's [provider reference](.agents/skills/bootstrap-agent-repo/references/providers.md) and [subagent reference](.agents/skills/bootstrap-agent-repo/references/subagents.md). Shared agent roles use `.agents/agents/` as a repository convention; host-specific definitions point back to them where supported.
+
+## Bootstrap a pnpm workspace
+
+[`bootstrap-pnpm-workspace`](.agents/skills/bootstrap-pnpm-workspace/SKILL.md) guides an agent through setting up a pnpm workspace with a pinned Node version for nvm, separate application and library directories, and native projects alongside Node packages. Give an agent the skill path or install the skill in its supported location, then ask it to bootstrap the target repository. The skill adapts existing configuration and does not provide a standalone command.
