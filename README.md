@@ -33,3 +33,7 @@ The shared and app skills specify the same ESLint baseline: recommended JavaScri
 [`bootstrap-nextjs-app`](.agents/skills/bootstrap-nextjs-app/SKILL.md) creates or adapts a Next.js and React TypeScript application with compatible quality tooling.
 
 Both app skills offer to use an existing shared web-config package, requiring explicit confirmation; otherwise they use local configuration.
+
+## Bootstrap workspace testing
+
+[`bootstrap-workspace-testing`](.agents/skills/bootstrap-workspace-testing/SKILL.md) discovers projects and existing tests in a pnpm workspace, then proposes suitable unit, integration, and browser E2E coverage for each project. It offers app-local or shared E2E ownership where appropriate and requires explicit approval of the testing plan before implementation.
