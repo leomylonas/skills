@@ -34,6 +34,10 @@ The shared and app skills specify the same ESLint baseline: recommended JavaScri
 
 Both app skills offer to use an existing shared web-config package, requiring explicit confirmation; otherwise they use local configuration.
 
+## Bootstrap source-consumed libraries
+
+[`bootstrap-react-component-library`](.agents/skills/bootstrap-react-component-library/SKILL.md) creates or adapts a React component library, and [`bootstrap-typescript-utility-library`](.agents/skills/bootstrap-typescript-utility-library/SKILL.md) does the same for a framework-independent TypeScript utility library. Both expose source to workspace consumers without a standalone bundle. They discover an existing shared web-config package and ask for confirmation before using it; otherwise they provide local quality configuration.
+
 ## Bootstrap workspace testing
 
 [`bootstrap-workspace-testing`](.agents/skills/bootstrap-workspace-testing/SKILL.md) discovers projects and existing tests in a pnpm workspace, then proposes suitable unit, integration, and browser E2E coverage for each project. It offers app-local or shared E2E ownership where appropriate and requires explicit approval of the testing plan before implementation.
