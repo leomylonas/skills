@@ -15,3 +15,21 @@ Provider discovery, subagent capabilities, and symlink support vary by host and 
 ## Bootstrap a pnpm workspace
 
 [`bootstrap-pnpm-workspace`](.agents/skills/bootstrap-pnpm-workspace/SKILL.md) guides an agent through setting up a pnpm workspace with a pinned Node version for nvm, separate application and library directories, and native projects alongside Node packages. Give an agent the skill path or install the skill in its supported location, then ask it to bootstrap the target repository. The skill adapts existing configuration and does not provide a standalone command.
+
+## Bootstrap shared web tooling
+
+[`bootstrap-shared-web-config`](.agents/skills/bootstrap-shared-web-config/SKILL.md) guides an agent in creating a workspace library of shared ESLint, Prettier, Stylelint, and TypeScript configurations. It covers browser-oriented TypeScript and React libraries, Vite SPAs, and Next.js, resolving current stable tool versions when run and reporting compatibility conflicts.
+
+The skill selects one TypeScript version supported by the current lint and framework tooling, and composes Next's ESLint plugin with a compatible React plugin when necessary.
+
+The shared and app skills specify the same ESLint baseline: recommended JavaScript, TypeScript, React, and React Hooks presets, with Next-specific rules for Next apps and Prettier conflict suppression last. Each skill describes the applicable presets and local override behavior.
+
+## Bootstrap a React Vite app
+
+[`bootstrap-react-vite-app`](.agents/skills/bootstrap-react-vite-app/SKILL.md) creates or adapts a React and TypeScript SPA with Vite and compatible quality tooling.
+
+## Bootstrap a Next.js app
+
+[`bootstrap-nextjs-app`](.agents/skills/bootstrap-nextjs-app/SKILL.md) creates or adapts a Next.js and React TypeScript application with compatible quality tooling.
+
+Both app skills offer to use an existing shared web-config package, requiring explicit confirmation; otherwise they use local configuration.
