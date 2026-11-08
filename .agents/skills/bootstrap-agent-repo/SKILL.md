@@ -7,6 +7,8 @@ description: Bootstrap or adapt a repository for coding agents with shared instr
 
 Create a small, project-specific shared foundation, not a generic policy dump. The repository root is the target unless the user specifies another directory. This is a change to that repository, not an installation of this skill into it.
 
+Read the packaged [TypeScript and React style guide](references/styleguide.md). Its rules apply when generating or modifying applicable TypeScript/React code, not to unrelated languages or to an empty repository's choice of technology.
+
 ## 1. Inspect before changing
 
 - Inspect the repository, including hidden files, existing agent instructions at root and in relevant subdirectories, provider configuration and skills, documentation, project manifests, and CI. Follow existing links only after checking their targets. Identify the repository root and respect nested project boundaries.
@@ -37,6 +39,10 @@ Add only the selected hosts' entry points described in [provider conventions](re
 Create directories only as needed; Git does not track empty directories. If no skills or custom agents exist, add `.agents/skills/.gitkeep` and `.agents/agents/.gitkeep` respectively. If documentation is needed, use the existing documentation location or create `docs/` with a useful index; do not duplicate an existing README.
 
 Create or carefully merge `AGENTS.md`. Include concise, verified project purpose, layout, applicable development and verification commands, important constraints, and pointers to relevant docs, `.agents/skills/`, and `.agents/agents/`. For an empty repository, state that project-specific commands are not yet established; do not prescribe a technology stack. Direct agents without native discovery to inspect the canonical directories and read relevant instructions before using a skill or agent.
+
+Include one complete copy of the packaged style guide at the target repository root as `STYLEGUIDE.md`, not inside individual workspace packages. Link it from the existing README/contributor documentation and instruct agents in root `AGENTS.md` to read and follow it for applicable projects; provider-specific files continue to point to `AGENTS.md`. Do not link back to the skill installation or duplicate the rules in agent instructions. If a target guide differs, preserve it, explain the conflict and ask before replacing or reconciling it. Verify both developer and agent pointers resolve.
+
+Inspect existing guide locations before copying. If another style guide or package-local copy already exists, do not create a duplicate or delete it; ask how to reconcile or relocate it to the root and update references.
 
 Each new provider instruction file should contain only a direct instruction to read and follow root `AGENTS.md`, for example `Read and follow the repository's root AGENTS.md.` A Markdown link alone is not a guarantee of loading: use explicit imperative text. Merge this pointer into an existing file without removing its rules; avoid adding it twice. Do not create competing copies of shared rules. Preserve existing provider-specific instructions and nested overrides. Reconcile shared rules into `AGENTS.md` only when their meanings are compatible and references can be updated safely.
 

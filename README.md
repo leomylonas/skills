@@ -2,6 +2,8 @@
 
 This repository contains portable [Agent Skills](https://agentskills.io/specification).
 
+The canonical [TypeScript and React style guide](STYLEGUIDE.md) defines conventions applied by the bootstrap skills. Each relevant skill packages an identical reference so it also works when installed independently; keep those references in sync with the canonical guide. Generated workspaces receive one root-level `STYLEGUIDE.md`, referenced by contributor and agent instructions, not one copy per package.
+
 ## Bootstrap an agent-ready repository
 
 [`bootstrap-agent-repo`](.agents/skills/bootstrap-agent-repo/SKILL.md) guides an agent through setting up shared instructions, custom agents and subagents, documentation, and skill discovery in an empty or existing repository. It preserves existing configuration and reports conflicts rather than silently overwriting it.
@@ -34,6 +36,8 @@ The shared and app skills specify the same ESLint baseline: recommended JavaScri
 
 Both app skills offer to use an existing shared web-config package, requiring explicit confirmation; otherwise they use local configuration.
 
+React app and component-library skills use CSS Modules for project-owned styles, with at most one app-level global CSS entry and exceptions for CSS required by dependencies. They do not introduce SCSS/Sass.
+
 ## Bootstrap source-consumed libraries
 
 [`bootstrap-react-component-library`](.agents/skills/bootstrap-react-component-library/SKILL.md) creates or adapts a React component library, and [`bootstrap-typescript-utility-library`](.agents/skills/bootstrap-typescript-utility-library/SKILL.md) does the same for a framework-independent TypeScript utility library. Both expose source to workspace consumers without a standalone bundle. They discover an existing shared web-config package and ask for confirmation before using it; otherwise they provide local quality configuration.
@@ -41,3 +45,7 @@ Both app skills offer to use an existing shared web-config package, requiring ex
 ## Bootstrap workspace testing
 
 [`bootstrap-workspace-testing`](.agents/skills/bootstrap-workspace-testing/SKILL.md) discovers projects and existing tests in a pnpm workspace, then proposes suitable unit, integration, and browser E2E coverage for each project. It offers app-local or shared E2E ownership where appropriate and requires explicit approval of the testing plan before implementation.
+
+## Adopt preferred libraries
+
+[`adopt-preferred-libraries`](.agents/skills/adopt-preferred-libraries/SKILL.md) inspects existing projects and proposes appropriate UI, routing, server-state, validation, forms, date, client-state, and JSON API libraries. It offers Carbon or Mantine for UI, with Mantine forms and optional extras where appropriate, and asks for approval per library and project before integrating or migrating anything.

@@ -7,6 +7,20 @@ description: Create or adapt a production-working React and TypeScript Vite brow
 
 Create or adapt a real browser SPA, not a template-only deliverable. Work in the target repository and preserve existing projects, package-manager choices, source structure, scripts, styles, and uncommitted changes unless a compatible migration requires a change. Use local project dependencies and package-manager commands only; never install tools globally.
 
+Use plain CSS Modules (`*.module.css`) for project-owned component and feature styles. At most one application-wide global CSS entry is allowed for resets, base elements and shared tokens; import it once at the app entry. Do not introduce SCSS/Sass or other project-owned non-module stylesheets/imports. Non-module CSS required by an installed package or library is an exception; import it as documented. For an existing conflicting styling system, preserve behavior, report the conflict and ask before a migration; don't silently rewrite unrelated styles.
+
+## Required project conventions
+
+Before generating or changing TypeScript, TSX, CSS, tooling, or project documentation, read this skill's packaged `references/styleguide.md`. Apply it to the generated project, not merely as a link: use domain-first, PascalCase source directories and ordinary filenames; give substantive components a same-named PascalCase directory with colocated module CSS, private hooks, children, and tests; reserve standalone `.tsx` files for lightweight composition such as `App.tsx` or `Layout.tsx`. Keep private children under their owner, promote only genuinely feature- or cross-feature-reused code, and create no empty speculative trees.
+
+Generate React components as named function declarations and named exports, except where a toolchain requires a default export. Define props as `type ComponentNameProps`, accept `props: ComponentNameProps`, and destructure on the first line of the body. Use `type` for ordinary shapes, `interface IName` only for class-oriented contracts, `import type` for type-only dependencies, strict TypeScript, and precise types or `unknown` rather than `any`; permit an exceptional `any` only with a narrow explanatory lint suppression. Use direct relative imports to defining source modules; never create `index.ts`/`index.tsx` barrels, broad re-export registries, or imports through them. Configure enforcement for type-only imports (with autofix where supported), explicit `any`, and runtime dependency cycles. Cycle detection must report runtime cycles while allowing type-only cycles (for example, configure the selected rule/tool's type-import exclusion rather than disabling cycle checks).
+
+Use kebab-case CSS selectors and camelCase CSS Module access. Colocate each `Component.module.css` with `Component.tsx`; retain the CSS policy above, including its prohibition on project-owned SCSS/Sass. For Vite, configure `css.modules.localsConvention: 'camelCaseOnly'` and make any generated CSS-module declarations expose the same camelCase keys. Do not hide a mismatch with an unrestricted CSS-module index signature. Verify with a real component that a kebab-case selector, such as `.navigation-item`, is emitted as a nonempty `styles.navigationItem` class and applies in both the development browser and production preview; a passing typecheck or build alone is not proof.
+
+Copy the packaged guide verbatim to the target repository/workspace root as `STYLEGUIDE.md`: keep exactly one canonical copy per project/workspace, never a per-package copy. If an existing root guide differs, preserve it, report the conflict, and ask before replacement. Explicitly reference the canonical guide in the existing contributor README and root `AGENTS.md`; create only a minimal root `AGENTS.md` when it is absent, and do not duplicate guide rules in either file. Do not link generated projects to this source skill. Verify the guide file and both references as part of documentation review.
+
+Inspect existing guide locations before copying. If another style guide or package-local copy already exists, do not create a duplicate or delete it; ask how to reconcile or relocate it to the root and update references.
+
 ## 1. Inspect before choosing a location or toolchain
 
 1. Inspect the repository root and the target directory before writing: hidden files, package manifests and lockfiles, workspace configuration, Node/package-manager pins, `apps/` and existing application directories, source files, Vite/TypeScript/ESLint/Prettier/Stylelint configuration, CI, documentation, and real scripts. Determine the workspace root from its actual configuration; do not infer it from a directory name or assume pnpm.
@@ -53,7 +67,7 @@ A shared web-config package is optional. Its discovery must be accurate, and its
    - `lint:styles`: invokes Stylelint only when the app has CSS or another supported stylesheet syntax.
 
    Add `lint:fix`, `format`, or style fixes only as explicit destructive counterparts; never make the verification scripts rewrite files. Do not create no-op scripts, use shell globs that behave differently across platforms, or make root recursive scripts invoke themselves.
-5. Include styles actually rendered by the application. If there are no styles, do not add Stylelint merely to satisfy a checklist. If there are CSS files, configure Stylelint for the syntax actually present and make its script inspect real style files. Do not configure SCSS, CSS Modules, Tailwind, or plugins without a consumer.
+5. Include styles actually rendered by the application. Use CSS Modules and the permitted global entry as described above. If there are no styles, do not add Stylelint merely to satisfy a checklist. If there are CSS files, configure Stylelint to check actual module and permitted global CSS files; do not add SCSS/Sass support for new styles or unrelated syntax plugins.
 
 ### Existing application
 
@@ -79,15 +93,15 @@ A shared web-config package is optional. Its discovery must be accurate, and its
 ### Standalone configuration
 
 1. Create local configs only for tooling actually used. Use current ESLint flat configuration with JavaScript/TypeScript recommended rules, React and React Hooks rules, TypeScript-aware rules where the selected setup supports them, browser globals scoped to browser files, and Node globals scoped only to Vite/config files. Exclude generated/build output. Register each plugin once and do not apply browser globals to config files blindly.
-2. Add a small shareable Prettier configuration only when formatting is used. Prefer existing repository choices or Prettier defaults over an invented style policy. Put `eslint-config-prettier` after conflicting ESLint rules when using both tools.
+2. Add a shareable Prettier configuration when formatting is used. For a new configuration, use exactly `{ semi: true, singleQuote: true, trailingComma: 'all', tabWidth: 2, useTabs: false, printWidth: 100, bracketSpacing: true, arrowParens: 'avoid' }`; preserve an existing conflicting configuration and ask before reconciling it. Do not add import sorting or any rule not required here. Put `eslint-config-prettier` after conflicting ESLint rules when using both tools.
 3. Add a Stylelint recommended-standard configuration only for real CSS. Scope extra syntax parsers or plugins to actual file types. Do not lint generated assets or unsupported stylesheet formats.
 4. Keep TypeScript settings local and app-specific. Do not use a shared package path, fictional config file, or a second compiler to imitate the shared option.
 
 ### ESLint rule baseline
 
-For standalone configs, compose `@eslint/js` `configs.recommended`, `typescript-eslint` `configs.recommended`, `@eslint-react/eslint-plugin` `configs.recommended`, and `eslint-plugin-react-hooks` `configs.flat.recommended`; put `eslint-config-prettier` last. Keep `@typescript-eslint/no-unused-vars`, `react-hooks/rules-of-hooks`, and `react-hooks/exhaustive-deps` enabled. Disable overlapping `@eslint-react/rules-of-hooks` and `@eslint-react/exhaustive-deps` when present to avoid duplicate diagnostics. Apply Hooks rules to `.js`, `.jsx`, `.ts`, and `.tsx`, including custom Hooks. The TypeScript preset is syntax-based; add type-aware rules only with a configured project service. Do not enable Next rules for Vite.
+For standalone configs, compose `@eslint/js` `configs.recommended`, `typescript-eslint` `configs.recommended`, `@eslint-react/eslint-plugin` `configs.recommended`, and `eslint-plugin-react-hooks` `configs.flat.recommended`; put `eslint-config-prettier` last. Keep `@typescript-eslint/no-unused-vars`, `react-hooks/rules-of-hooks`, and `react-hooks/exhaustive-deps` enabled. Explicitly set `@typescript-eslint/consistent-type-imports` to `['error', { prefer: 'type-imports', fixStyle: 'separate-type-imports' }]` and `@typescript-eslint/no-explicit-any` to `'error'`. Register `eslint-plugin-import-x` once, configure its TypeScript parser directly and a verified node resolver for relative TypeScript modules, and enable `import-x/no-cycle: 'error'` and `import-x/no-self-import: 'error'`; `import-x/no-cycle` ignores `import type` cycles. Probe any alias resolver before relying on it, and report CommonJS/dynamic-import analysis limitations rather than treating the rule as complete proof. Disable overlapping `@eslint-react/rules-of-hooks` and `@eslint-react/exhaustive-deps` when present to avoid duplicate diagnostics. Apply Hooks rules to `.js`, `.jsx`, `.ts`, and `.tsx`, including custom Hooks. The TypeScript preset is syntax-based; add type-aware rules only with a configured project service. Do not enable Next rules for Vite.
 
-For approved shared config, use its `eslint/react` preset rather than registering these plugins a second time; verify the effective config and add a narrowly scoped local override only if a required baseline rule is missing or project needs require it. Preserve existing local rules; document overrides. Preset membership can change with upstream versions, so pin the installed versions and inspect `eslint --print-config`.
+For approved shared config, use its `eslint/react` preset rather than registering these plugins a second time; verify the effective config explicitly enables `@typescript-eslint/consistent-type-imports` with the type-import/autofix options above, `@typescript-eslint/no-explicit-any: 'error'`, plus `import-x/no-cycle: 'error'` and `import-x/no-self-import: 'error'` with the parser/resolver configuration above. Add narrowly scoped local overrides only when one is missing or project needs require it. The shared or local Prettier configuration must use `{ semi: true, singleQuote: true, trailingComma: 'all', tabWidth: 2, useTabs: false, printWidth: 100, bracketSpacing: true, arrowParens: 'avoid' }`; preserve a conflicting existing configuration and ask before reconciliation. Preserve existing local rules; document overrides. Preset membership can change with upstream versions, so pin the installed versions and inspect `eslint --print-config`.
 
 ## 6. Install, document, and verify the real app
 
@@ -96,14 +110,15 @@ For approved shared config, use its `eslint/react` preset rather than registerin
 3. Run meaningful smoke checks using the app's real scripts and report exact commands and results:
 
    - dependency installation followed by the package manager's frozen/immutable install validation when applicable;
-   - `typecheck` using the single selected standard TypeScript compiler;
+   - `typecheck` using the single selected standard TypeScript compiler against actual component props and direct source imports;
    - ESLint through `lint`;
    - Prettier through `format:check` when configured;
    - Stylelint through `lint:styles` when configured;
    - Vite production `build`;
    - repeat `format:check` after the build; exclude generated output such as `dist/` or select source/config files explicitly without hiding source;
    - start `dev`, confirm Vite serves the app without checker configuration/load errors, introduce temporary TypeScript and ESLint errors, and confirm the running checker reports both and clears them after repair; remove the fixtures and stop the server afterward;
-   - `preview` of the built result when the environment permits; and
+   - `preview` of the built result when the environment permits;
+   - in both the development browser and production preview, confirm a rendered component has a nonempty class from `styles.navigationItem` for a `.navigation-item` selector and that its expected computed style applies; and
    - verify the resolved ESLint configuration actually enables React and React Hooks rules for application `.tsx` files, and use a temporary invalid Hooks example to prove diagnostics are reported; remove the fixture afterward.
 
 4. If a command cannot run because of unavailable runtime, network, credentials, or an established unrelated failure, report the exact command and blocker. Do not claim a template, generated files, or dependency installation proves the application runs. Summarize changed files, the resolved version set and compatibility evidence, selected shared/standalone path, checks exercised, and remaining blockers.
