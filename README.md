@@ -1,14 +1,16 @@
 # Reusable agent skills
 
-This repository contains portable [Agent Skills](https://agentskills.io/specification).
+This repository contains reusable [Agent Skills](https://agentskills.io/specification).
 
-The canonical [TypeScript and React style guide](STYLEGUIDE.md) defines conventions applied by the bootstrap skills. Each relevant skill packages an identical reference so it also works when installed independently; keep those references in sync with the canonical guide. Generated workspaces receive one root-level `STYLEGUIDE.md`, referenced by contributor and agent instructions, not one copy per package.
+The canonical [TypeScript and React style guide](STYLEGUIDE.md) is shared by all skills in this repository. Reference the skills as part of the whole repository so the guide remains available. Generated workspaces receive one root-level `STYLEGUIDE.md`, referenced by contributor and agent instructions, not one copy per package.
+
+Accessibility and responsive design are part of the style guide: implement user-facing changes with both in mind, verify relevant interactions and viewports, and report observed barriers to developers.
 
 ## Bootstrap an agent-ready repository
 
 [`bootstrap-agent-repo`](.agents/skills/bootstrap-agent-repo/SKILL.md) guides an agent through setting up shared instructions, custom agents and subagents, documentation, and skill discovery in an empty or existing repository. It preserves existing configuration and reports conflicts rather than silently overwriting it.
 
-Install or link `.agents/skills/bootstrap-agent-repo` into your agent's supported skills location, or give the agent the `SKILL.md` path explicitly. In the target repository, ask it to use `bootstrap-agent-repo` to make the repository agent-ready. The skill contains no standalone bootstrap command; the agent inspects and adapts the target repository.
+Keep this repository available as a whole and give the agent the `.agents/skills/bootstrap-agent-repo/SKILL.md` path within it. In the target repository, ask it to use `bootstrap-agent-repo` to make the repository agent-ready. The skill contains no standalone bootstrap command; the agent inspects and adapts the target repository.
 
 The skill asks which agent hosts to support, suggesting Codex and Claude Code as defaults. It also supports Copilot, Gemini CLI, Qwen Code, Cursor, OpenCode, and Windsurf; specify a complete selection in the request to skip the question. Only selected hosts receive provider-specific configuration, although other hosts may discover shared paths.
 
@@ -32,7 +34,7 @@ The shared and app skills specify the same ESLint baseline: recommended JavaScri
 
 ## Bootstrap a Next.js app
 
-[`bootstrap-nextjs-app`](.agents/skills/bootstrap-nextjs-app/SKILL.md) creates or adapts a Next.js and React TypeScript application with compatible quality tooling.
+[`bootstrap-nextjs-app`](.agents/skills/bootstrap-nextjs-app/SKILL.md) creates or adapts a Next.js and React TypeScript application with compatible quality tooling, using Turbopack for development and production. CSS Modules use exact selector keys with class-specific TypeScript declarations.
 
 Both app skills offer to use an existing shared web-config package, requiring explicit confirmation; otherwise they use local configuration.
 

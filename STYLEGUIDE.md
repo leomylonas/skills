@@ -81,7 +81,7 @@ The example is illustrative, not a mandatory scaffold: create only directories t
 | Type aliases, classes, props types | PascalCase | `NavigationProps`, `Order` |
 | Traditional class-oriented interfaces | `I` + PascalCase | `ILogger` |
 | CSS class selectors | kebab-case | `.navigation-item` |
-| CSS Module property access in TypeScript | camelCase | `styles.navigationItem` |
+| CSS Module property access in TypeScript | Exact kebab-case key | `styles['navigation-item']` |
 | Framework-reserved files/paths | Follow framework convention | `app/page.tsx`, `app/layout.tsx` |
 
 **Important:** Do not mix kebab-case feature folders with PascalCase component folders. Directory casing is consistently PascalCase except where a framework requires otherwise. Hook filenames are a deliberate exception to the ordinary PascalCase file rule because they match their hook function names. A utility file may be named `FormatCurrency.ts` even when it exports `formatCurrency`.
@@ -204,7 +204,7 @@ export function Navigation(props: NavigationProps) {
   const { items, selectedId } = props;
 
   return (
-    <nav className={styles.navigationContainer}>
+    <nav className={styles['navigation-container']}>
       {items.map(item => (
         <NavigationItem
           key={item.id}
@@ -457,8 +457,8 @@ export function OrderFilter(props: OrderFilterProps) {
 - Permit **one top-level global CSS stylesheet import** for application-wide baseline/global styling (such as resets, root tokens, and foundational element rules).
 - Additional imports of **vendor-provided stylesheets** are allowed when required by dependencies.
 - Colocate a component's CSS module with that component, using matching PascalCase filename.
-- Use **kebab-case selectors in CSS**, but **camelCase property access in TypeScript**.
-- Configure CSS Modules and generated TypeScript typings, if used, so camelCase exports/types actually exist. This behaviour is **not** automatic in TypeScript.
+- Use **kebab-case selectors in CSS** and access their exact keys in TypeScript, for example `styles['navigation-item']`.
+- Use class-specific TypeScript declarations or equivalent tooling so valid keys typecheck and misspelled keys fail. A generic string index signature does not detect typos. Keep declarations synchronized with their CSS, including when a stylesheet is renamed or deleted.
 - Prefer native CSS nesting.
 - Inline styles are allowed **only when genuinely necessary**, such as a dynamic value derived from state or props; do not use them for ordinary static presentation.
 - A parent may override child styling or layout when needed, but prefer child-owned styling and explicit styling APIs where practical.
@@ -489,11 +489,11 @@ type NavigationProps = {
 export function Navigation(props: NavigationProps) {
   const { children } = props;
 
-  return <nav className={styles.navigationContainer}>{children}</nav>;
+  return <nav className={styles['navigation-container']}>{children}</nav>;
 }
 ```
 
-**Tooling example:** With Vite, `css.modules.localsConvention: 'camelCaseOnly'` can expose camelCase module keys; ensure any generated declarations match. For Next.js, verify the chosen CSS Module pipeline supports the same camelCase mapping before generating code that assumes it. If it does not, provision the necessary compatible transformation or typed-module tooling rather than silently changing the agreed selector convention.
+**Tooling:** Vite and Next.js/Turbopack can use the original CSS Module keys without a custom naming transformation. Verify that the selected type tooling resolves the same exact keys at compile time and that styles apply at runtime; generated typings alone do not prove the runtime mapping.
 
 ### 9.2 Global and vendor styles
 
@@ -521,7 +521,7 @@ export function ProgressBar(props: ProgressBarProps) {
 
   return (
     <div
-      className={styles.progressBar}
+      className={styles['progress-bar']}
       style={{ '--progress': `${boundedProgress}%` } as CSSProperties}
     />
   );
@@ -631,6 +631,8 @@ The file remains PascalCase even though the standalone function is camelCase.
 | Explicit relative imports, named exports, no barrels | Yes | Yes, with mandatory framework exceptions | Yes | Yes |
 | Direct source consumption; no package entrypoint required | N/A | N/A | Yes | Yes |
 | State hierarchy and server-state separation | Yes | Yes | Where applicable | Not applicable |
+| Accessible UI and reporting observed barriers | Yes | Yes | Yes | Where a library produces user-facing output |
+| Responsive UI and viewport verification | Yes | Yes | Yes | Where a library produces user-facing output |
 | Colocated unit tests, boundary-focused mocking | Yes | Yes | Yes | Yes |
 | Application E2E test separation | Yes | Yes | Where applicable | Not generally applicable |
 
@@ -643,16 +645,37 @@ When bootstrapping a project:
 3. Generate React components using named functions, `type` props, `props: PropsType`, and first-line body destructuring.
 4. Generate direct relative imports to defining source files; avoid barrel `index.ts` files and unnecessary package export registries.
 5. Configure TypeScript strictness and lint enforcement for applicable mechanical rules. In particular, enforce/autofix type-only imports, flag explicit `any` (with narrowly documented suppressions), and prevent runtime circular dependencies.
-6. Configure CSS Module selector-to-TypeScript camelCase compatibility instead of assuming it exists.
+6. Ensure CSS Module types expose exact selector keys, reject misspellings and stay synchronized with their source stylesheets.
 7. Keep required framework files, names, exports, and CSS import locations intact.
 8. Include the style guide in the provisioned project so maintainers and coding agents can follow it. The exact destination/integration mechanism is up to the provisioning skill.
 9. Treat architectural choices such as ownership, appropriate sharing, DI, and encapsulation as review guidelines where they cannot be fully lint-enforced.
 10. Do not invent additional mandatory tooling, import ordering, public entry points, global state libraries, DI containers, or unrelated policies that this guide does not require.
 
-## 14. Out of scope for this guide
+## 14. Accessibility
 
-This guide intentionally does **not** currently prescribe detailed accessibility, performance, error-boundary, loading/empty-state, or memoisation policies. It also does not prescribe a complete ESLint rule list, a specific DI framework, a specific global state library, or mandatory import ordering. Those may be addressed separately.
+Accessibility is a default requirement, not an optional enhancement. When implementing a requested feature or changing user-facing output, choose an accessible implementation from the outset; do not wait for a separate accessibility request. Aim for the applicable [WCAG 2.2 AA success criteria](https://www.w3.org/TR/WCAG22/) and current platform guidance, while recognising that automated checks alone cannot establish conformance.
+
+- Prefer semantic HTML and native controls with correct names, roles and states. Use ARIA only when native semantics are insufficient, and keep it accurate as state changes.
+- Make functionality operable by keyboard, with a logical focus order, visible focus, appropriate focus management, and no keyboard traps. Do not make a pointer, hover, colour or animation the only way to understand or operate something.
+- Provide meaningful labels and instructions for inputs, accessible names for controls, useful text alternatives for informative images, and error messages that identify the affected field and explain how to correct the problem.
+- Use clear document structure and headings, readable contrast, scalable and responsive layouts, and respect reduced-motion preferences. Announce meaningful dynamic updates when necessary without overwhelming assistive technology.
+- Preserve or improve accessibility when changing existing UI. Exercise relevant keyboard, focus, labels, state transitions and error flows in a real browser; use available automated accessibility checks as a supplement, not a substitute for manual and assistive-technology verification. Report checks actually performed and any verification limitations; never claim WCAG conformance without a suitable assessment.
+- If you notice an existing accessibility barrier, **call it out to the developer**, including its location, user impact and a practical remedy. Fix issues within the requested change when appropriate; do not silently make unrelated or breaking changes. Report unresolved barriers rather than ignoring them.
+
+## 15. Responsive design
+
+Responsive design is required for all user-facing interfaces and components, not a later enhancement. Design and implement the requested behavior so it remains usable across narrow and wide viewports, different input methods and text sizes; preserve this behavior when modifying existing UI.
+
+- Let content and layout adapt to available space using flexible sizing, wrapping and appropriate CSS breakpoints or container queries. Choose breakpoints based on the content, not assumptions about specific devices.
+- Keep text readable and controls usable without clipping, overlap or unintended page-level horizontal scrolling. Preserve access to navigation, form feedback and actions at narrow widths. Content such as large data tables may need deliberate local scrolling when its two-dimensional layout is essential.
+- Respect browser zoom and text enlargement; don't disable zoom or rely on a fixed viewport. Keep keyboard and touch interaction practical and retain visible focus and accessible names at all sizes.
+- When UI behavior or layout changes, verify the actual rendered surface at representative narrow and wide viewport sizes and at intermediate widths where the layout changes. Exercise relevant navigation and interactions, inspect overflow, and check zoom/text enlargement where appropriate. For reusable components, verify in a realistic consuming layout. Automated viewport checks can supplement visual and interaction checks.
+- Report the viewport sizes and checks actually performed, as well as any blocker or unverified condition. Call out observed responsive defects in existing code with their location, impact and a practical remedy; avoid unrelated or breaking changes without approval.
+
+## 16. Out of scope for this guide
+
+This guide does not prescribe detailed performance, error-boundary, loading/empty-state, or memoisation policies. It also does not prescribe a complete ESLint rule list, a specific DI framework, a specific global state library, or mandatory import ordering. Those may be addressed separately.
 
 ---
 
-**Summary:** Domain-first structure; PascalCase directories and ordinary filenames; hook-name exception; component folders by default with a narrow lightweight-composition exception; nested private children; colocated tests/styles/hooks; named functions and exports; `type`-first TypeScript with `I`-prefixed class contracts; props destructured on the first line of the function body; strict typing with lint-controlled `any` exceptions; CSS Modules with kebab-case selectors/camelCase TypeScript access; explicit relative source imports without barrels; no runtime dependency cycles; thoughtful encapsulation and lightweight dependency injection; framework conventions override where required.
+**Summary:** Domain-first structure; PascalCase directories and ordinary filenames; hook-name exception; component folders by default with a narrow lightweight-composition exception; nested private children; colocated tests/styles/hooks; named functions and exports; `type`-first TypeScript with `I`-prefixed class contracts; props destructured on the first line of the function body; strict typing with lint-controlled `any` exceptions; CSS Modules with exact kebab-case keyed TypeScript access; explicit relative source imports without barrels; no runtime dependency cycles; thoughtful encapsulation and lightweight dependency injection; accessible, responsive implementations and reporting observed barriers; framework conventions override where required.

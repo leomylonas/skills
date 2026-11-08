@@ -7,7 +7,7 @@ description: Bootstrap or adapt a pnpm monorepo with nvm-managed Node.js, separa
 
 Set up the target repository for multiple projects, including projects that do not use Node.js. The target is the repository root unless the user specifies a different workspace root. Adapt existing repositories as well as empty ones; preserve their behavior and existing work.
 
-Read the packaged [TypeScript and React style guide](references/styleguide.md). Apply its applicable conventions to TypeScript/React code produced by this skill; it does not impose a Node or React stack on non-Node projects.
+Read the [repository's canonical TypeScript and React style guide](../../../STYLEGUIDE.md). Apply its applicable conventions to TypeScript/React code produced by this skill; it does not impose a Node or React stack on non-Node projects.
 
 ## 1. Inspect and plan
 
@@ -41,7 +41,7 @@ libs/                # reusable libraries in any language
 - Generate `pnpm-lock.yaml` using the pinned pnpm version and the real manifests; do not hand-write a lockfile or discard existing dependencies. Use `workspace:` references when an actual Node package depends on a local workspace package, preserving compatible dependency ranges and publish behavior. Do not create example applications or libraries unless requested.
 - Preserve each non-Node project's native manifest, lockfile, runtime, and build/test commands. Document how to install and run those commands independently. If unified root commands are required by the user or already exist, integrate real native commands explicitly, preserve failures and working directories, and verify they run; do not claim `pnpm -r` discovers native-only projects. Never create fake `package.json` files or no-op scripts. Do not add root recursive scripts that call themselves; root inclusion and missing-script behavior vary by pnpm configuration and version.
 
-- Copy one complete copy of the packaged guide into the workspace root as `STYLEGUIDE.md`, never into each package and never as a link back to this skill installation. Link it from the existing README/contributor docs and instruct agents to read and follow it in root `AGENTS.md`, creating a minimal file if absent. Preserve existing instructions and avoid duplicate pointers. If an existing target guide differs, do not overwrite it: explain the conflict and ask before replacing or reconciling it. Verify the guide and references resolve.
+- Copy one complete copy of the canonical guide into the workspace root as `STYLEGUIDE.md`, never into each package and never as a link back to this skill installation. Link it from the existing README/contributor docs and instruct agents to read and follow it in root `AGENTS.md`, creating a minimal file if absent. Preserve existing instructions and avoid duplicate pointers. If an existing target guide differs, do not overwrite it: explain the conflict and ask before replacing or reconciling it. Verify the guide and references resolve.
 - Inspect existing guide locations before copying. If another style guide or package-local copy already exists, do not create a duplicate or delete it; ask how to reconcile or relocate it to the root and update references.
 
 ## 4. Verify and document
